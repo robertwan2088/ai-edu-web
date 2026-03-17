@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>AI 育儿助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#f5f5f5}
+.phone{width:100%;max-width:430px;height:100vh;margin:0 auto;background:#fff;overflow:hidden;position:relative}
+.sbar{height:44px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600}
+.pg{display:none;position:absolute;top:44px;left:0;right:0;bottom:0;flex-direction:column;overflow:hidden}
+.pg.on{display:flex}
+.scrl{flex:1;overflow-y:auto}.scrl::-webkit-scrollbar{display:none}
+.tab{height:64px;background:#fff;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-around;padding-bottom:8px;flex-shrink:0}
+.ti{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 12px;color:#999;font-size:10px}
+.ti.on{color:#FF9F43}
+.ti .ic{font-size:22px}
+.hbanner{background:linear-gradient(135deg,#FF9F43,#FF6B6B);border-radius:20px;padding:24px;color:#fff;margin:20px;position:relative;overflow:hidden}
+.hbanner h2{font-size:22px;margin-bottom:8px}.hbanner p{font-size:13px;opacity:.9;line-height:1.5}
+.hbanner .be{font-size:48px;position:absolute;right:16px;top:12px}
+.stit{font-size:17px;font-weight:700;color:#333;margin:0 20px 14px}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 20px;margin-bottom:30px}
+.ac{background:#fff;border-radius:16px;padding:20px 16px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.05);text-align:center;transition:transform .2s}
+.ac:active{transform:scale(.97)}.ac .i{font-size:36px;margin-bottom:8px}.ac h4{font-size:15px;color:#333;margin-bottom:4px}.ac p{font-size:11px;color:#999}
+.tip{background:#F8F9FA;border-radius:16px;padding:20px;margin:0 20px 30px}
+.tip .th{display:flex;align-items:center;gap:8px;margin-bottom:12px}.tip .th h4{font-size:15px;color:#333}
+.tip .tc{font-size:13px;color:#666;line-height:1.8}
+.nb{height:52px;background:#fff;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
+.nb .bk{font-size:20px;cursor:pointer;padding:8px;margin-left:-8px}.nb .tt{flex:1;text-align:center;font-size:17px;font-weight:600;color:#2D2D2D;margin-right:28px}
+.lpage{background:linear-gradient(180deg,#FFF5E6,#FFF 50%)}
+.lc{padding:40px 28px;display:flex;flex-direction:column;align-items:center}
+.llogo{text-align:center;margin-bottom:40px}.llogo .e{font-size:72px}.llogo h1{font-size:26px;color:#2D2D2D;margin-top:12px}.llogo p{font-size:14px;color:#999;margin-top:6px}
+.ltabs{display:flex;width:100%;margin-bottom:30px;border-bottom:2px solid #f0f0f0}
+.ltab{flex:1;text-align:center;padding:12px 0;font-size:15px;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.ltab.on{color:#FF9F43;border-bottom-color:#FF9F43;font-weight:600}
+.lf{width:100%}.fg{margin-bottom:20px}.fg label{display:block;font-size:13px;color:#666;margin-bottom:8px;font-weight:500}
+.fi{width:100%;height:48px;border-radius:12px;border:2px solid #E8E8E8;padding:0 16px;font-size:15px;outline:none;background:#fff}
+.fi:focus{border-color:#FF9F43}.fi::placeholder{color:#ccc}
+.fr{display:flex;gap:12px}.fr .fi{flex:1}
+.cb{width:110px;height:48px;border-radius:12px;border:2px solid #FF9F43;background:#fff;color:#FF9F43;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.bp{width:100%;height:52px;border-radius:26px;border:none;background:linear-gradient(135deg,#FF9F43,#FF6B6B);color:#fff;font-size:17px;font-weight:600;cursor:pointer;margin-top:10px}
+.bp:active{transform:scale(.98)}
+.lftr{margin-top:30px;text-align:center}
+.lftr .dv{display:flex;align-items:center;gap:12px;color:#ccc;font-size:12px;margin-bottom:20px}
+.lftr .dv::before,.lftr .dv::after{content:'';flex:1;height:1px;background:#e0e0e0}
+.sl{display:flex;justify-content:center;gap:20px}
+.sb{width:48px;height:48px;border-radius:50%;border:1px solid #e0e0e0;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;background:#fff}
+.lag{font-size:11px;color:#bbb;margin-top:20px;text-align:center;line-height:1.6}.lag a{color:#FF9F43;text-decoration:none}
+.pf{background:#F8F9FA}
+.ph{background:linear-gradient(135deg,#FF9F43,#FF6B6B);padding:30px 20px 40px;color:#fff}
+.pi2{display:flex;align-items:center;gap:16px}
+.pa{width:64px;height:64px;border-radius:32px;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:32px}
+.pn h3{font-size:20px}.pn p{font-size:13px;opacity:.8;margin-top:4px}
+.ps{display:flex;justify-content:space-around;margin-top:24px;background:rgba(255,255,255,.15);border-radius:16px;padding:16px 0}
+.si2{text-align:center}.si2 .n{font-size:22px;font-weight:700}.si2 .l{font-size:11px;opacity:.8;margin-top:2px}
+.pst{margin-top:16px}.pstt{font-size:13px;color:#999;padding:12px 20px}
+.ml{background:#fff}
+.mi{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.mi:last-child{border-bottom:none}.mi .mi2{font-size:20px;margin-right:14px}
+.mi .mt{flex:1;font-size:15px;color:#333}.mi .ma{color:#ccc;font-size:14px}
+.mi .mb{background:#FF6B6B;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-right:8px}
+.lobtn{margin:24px 20px;height:48px;border-radius:24px;border:2px solid #FF6B6B;background:#fff;color:#FF6B6B;font-size:15px;cursor:pointer;width:calc(100% - 40px)}
+.cm{flex:1;padding:16px;overflow-y:auto;background:#F8F9FA}.cm::-webkit-scrollbar{display:none}
+.msg{display:flex;margin-bottom:16px;gap:10px}.msg.ai{flex-direction:row}.msg.us{flex-direction:row-reverse}
+.av{width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.msg.ai .av{background:#FFECD2}.msg.us .av{background:#D4E5FF}
+.bu{max-width:75%;padding:12px 16px;border-radius:18px;font-size:15px;line-height:1.6;word-break:break-word}
+.msg.ai .bu{background:#fff;color:#333;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.msg.us .bu{background:#54A0FF;color:#fff;border-bottom-right-radius:4px}
+.ex{padding:8px 16px 12px;background:#F8F9FA}
+.ex .el{font-size:12px;color:#999;margin-bottom:8px}
+.eb{display:inline-block;background:#fff;border:1px solid #E8E8E8;border-radius:20px;padding:8px 14px;font-size:13px;color:#666;cursor:pointer;margin:3px}
+.eb:active{background:#54A0FF;color:#fff;border-color:#54A0FF}
+.ci{padding:10px 16px;background:#fff;border-top:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ci input{flex:1;height:40px;border-radius:20px;border:1px solid #e0e0e0;padding:0 16px;font-size:15px;outline:none;background:#F8F9FA}
+.ci input:focus{border-color:#54A0FF;background:#fff}
+.ci .sbtn{width:40px;height:40px;border-radius:20px;background:#54A0FF;border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bkpg{background:#FFFBF0}
+.bkst{padding:24px 20px}
+.sdi{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px}
+.sd{width:10px;height:10px;border-radius:5px;background:#E0E0E0}.sd.on{width:24px;background:#FF9F43}
+.gs{display:flex;gap:10px}
+.gb{flex:1;height:48px;border-radius:12px;border:2px solid #E8E8E8;background:#fff;font-size:15px;cursor:pointer}
+.gb.on{border-color:#FF9F43;background:#FFF8F0}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.tc2{background:#fff;border-radius:16px;padding:18px 12px;text-align:center;border:2px solid #f0f0f0;cursor:pointer}
+.tc2.on{border-color:#FF9F43;background:#FFF8F0}
+.tc2 .ti2{font-size:30px;margin-bottom:6px}.tc2 .tn{font-size:14px;color:#333;font-weight:600}.tc2 .td{font-size:11px;color:#999;margin-top:3px}
+.ldc{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px}
+.le{font-size:48px;animation:bo 1s ease infinite}
+@keyframes bo{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.lt{margin-top:20px;font-size:16px;color:#666}
+.stc{padding:16px 20px}
+.stt2{text-align:center;font-size:20px;color:#333;font-weight:700;margin-bottom:16px}
+.stimg{width:100%;height:180px;background:linear-gradient(135deg,#FFECD2,#FCB69F);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:20px}
+.sttx{font-size:15px;color:#444;line-height:2}.sttx p{margin-bottom:14px;text-indent:2em}
+.stac{display:flex;gap:10px;padding:12px 20px;background:#fff;border-top:1px solid #f0f0f0;margin-top:16px}
+.stac button{flex:1;height:44px;border-radius:22px;border:2px solid #E8E8E8;background:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;color:#333}
+.stac button.pb{background:#FF9F43;border-color:#FF9F43;color:#fff}
+.sp{display:none;position:absolute;top:44px;left:0;right:0;bottom:0;z-index:20;background:#fff;flex-direction:column;overflow:hidden}
+.sp.on{display:flex}
+.tdi{display:inline-flex;gap:4px;padding:4px 0}
+.tdd{width:8px;height:8px;border-radius:50%;background:#999;animation:ty 1.4s ease infinite}
+.tdd:nth-child(2){animation-delay:.2s}.tdd:nth-child(3){animation-delay:.4s}
+.timeline{padding:20px}.timeline-item{display:flex;gap:14px;margin-bottom:24px;position:relative}.timeline-item::before{content:'';position:absolute;left:19px;top:44px;bottom:-4px;width:2px;background:#f0f0f0}.timeline-item:last-child::before{display:none}.timeline-dot{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;z-index:1}.timeline-content{flex:1;background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.04)}.timeline-content h4{font-size:14px;color:#333;margin-bottom:4px}.timeline-content p{font-size:13px;color:#666;line-height:1.5;margin-bottom:6px}.timeline-content .tl-time{font-size:11px;color:#bbb}
+.game-list{padding:16px 20px;display:flex;flex-direction:column;gap:14px}.game-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer}.game-card:active{opacity:.9}.gc-banner{height:120px;display:flex;align-items:center;justify-content:center;font-size:48px}.gc-info{padding:14px 16px}.gc-info h4{font-size:15px;color:#333;margin-bottom:4px}.gc-info p{font-size:12px;color:#999}.gc-info .gc-tags{display:flex;gap:6px;margin-top:8px}.gc-tag{font-size:10px;color:#FF9F43;background:#FFF5E6;padding:3px 8px;border-radius:10px}
+.book-list{padding:16px 20px;display:flex;flex-direction:column;gap:12px}.book-item{display:flex;gap:14px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer}.book-item:active{opacity:.9}.book-cover{width:70px;height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}.book-info{flex:1}.book-info h4{font-size:15px;color:#333;margin-bottom:6px}.book-info p{font-size:12px;color:#999;line-height:1.6}.book-info .bi-tags{display:flex;gap:6px;margin-top:8px}.bi-tag{font-size:10px;color:#54A0FF;background:#E8F4FF;padding:2px 8px;border-radius:8px}
+.hist-list{padding:16px 20px}.hist-item{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer}.hist-item:active{opacity:.9}.hist-item h4{font-size:14px;color:#333;margin-bottom:4px;display:flex;align-items:center;gap:6px}.hist-item h4 span{font-size:12px;color:#999;font-weight:400}.hist-item p{font-size:13px;color:#888;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.set-section{margin-top:16px}.set-section .ss-title{font-size:13px;color:#999;padding:12px 20px}.set-item{display:flex;align-items:center;padding:16px 20px;background:#fff;border-bottom:1px solid #f5f5f5;cursor:pointer}.set-item:last-child{border-bottom:none}.set-item .si-icon{font-size:20px;margin-right:14px}.set-item .si-text{flex:1;font-size:15px;color:#333}.set-item .si-val{font-size:13px;color:#999;margin-right:8px}.set-item .si-arrow{color:#ccc;font-size:14px}
+.fb-form{padding:20px}.fb-form .fg2{margin-bottom:20px}.fb-form .fg2 label{display:block;font-size:14px;color:#333;font-weight:600;margin-bottom:10px}.fb-form textarea{width:100%;height:120px;border-radius:12px;border:2px solid #E8E8E8;padding:14px;font-size:15px;outline:none;resize:none;font-family:inherit}.fb-form textarea:focus{border-color:#FF9F43}.fb-form textarea::placeholder{color:#ccc}
+.faq-list{padding:0 20px}.faq-item{padding:16px 0;border-bottom:1px solid #f0f0f0;cursor:pointer}.faq-item:last-child{border-bottom:none}.faq-q{font-size:15px;color:#333;display:flex;align-items:center;justify-content:space-between}.faq-a{font-size:13px;color:#666;line-height:1.6;margin-top:8px;display:none}.faq-item.open .faq-a{display:block}
+.child-card{background:#fff;border-radius:16px;padding:20px;margin:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.04)}.child-card .cc-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}.child-card .cc-avatar{width:56px;height:56px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:28px}.child-card .cc-name{font-size:18px;font-weight:600;color:#333}.child-card .cc-age{font-size:13px;color:#999;margin-top:2px}.cc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.cc-stat{text-align:center;padding:12px 0;background:#F8F9FA;border-radius:12px}.cc-stat .cs-num{font-size:20px;font-weight:700;color:#FF9F43}.cc-stat .cs-label{font-size:11px;color:#999;margin-top:4px}.cc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.cc-tag{font-size:11px;color:#666;background:#F0F0F0;padding:4px 10px;border-radius:12px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;border-bottom:1px solid #f5f5f5}.toggle-row .tr-left{flex:1}.toggle-row .tr-left h4{font-size:15px;color:#333;margin-bottom:4px}.toggle-row .tr-left p{font-size:12px;color:#999}.toggle{width:48px;height:28px;border-radius:14px;background:#E0E0E0;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}.toggle.on{background:#FF9F43}.toggle::after{content:'';position:absolute;width:24px;height:24px;border-radius:12px;background:#fff;top:2px;left:2px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.15)}.toggle.on::after{transform:translateX(20px)}
+.edit-form{padding:20px}.edit-form .ef-row{margin-bottom:20px}.edit-form .ef-row label{display:block;font-size:13px;color:#666;margin-bottom:8px;font-weight:500}.edit-form .ef-row input,.edit-form .ef-row select{width:100%;height:48px;border-radius:12px;border:2px solid #E8E8E8;padding:0 16px;font-size:15px;outline:none;background:#fff}.edit-form .ef-row input:focus{border-color:#FF9F43}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="sbar"><span id="clock">16:30</span><span>📶 🔋 87%</span></div>
+
+<!-- HOME -->
+<div id="p-home" class="pg on">
+<div class="scrl" style="background:linear-gradient(180deg,#FFF5E6,#FFF 40%)">
+<div style="padding:20px">
+<div class="hbanner"><span class="be">🤱</span><h2>AI 育儿助手</h2><p>智能育儿问答 · 个性化绘本生成<br>让每个孩子都有专属的成长伙伴</p></div>
+<div class="stit">✨ 快捷功能</div>
+<div class="qa">
+<div class="ac" onclick="openS('s-chat')"><div class="i">💬</div><h4>育儿问答</h4><p>AI 顾问随时解答</p></div>
+<div class="ac" onclick="openS('s-bk1')"><div class="i">📖</div><h4>AI 绘本</h4><p>生成专属故事</p></div>
+<div class="ac" onclick="openS('s-growth')"><div class="i">📊</div><h4>成长记录</h4><p>记录孩子成长</p></div>
+<div class="ac" onclick="openS('s-games')"><div class="i">🎮</div><h4>互动游戏</h4><p>边玩边学</p></div>
+</div>
+<div class="stit">💡 今日推荐</div>
+<div class="tip" style="margin:0 0 30px"><div class="th"><span>📝</span><h4>育儿小贴士</h4></div><div class="tc"><b>如何培养 5-6 岁孩子的阅读习惯？</b><br><br>1. 每天固定 15-20 分钟亲子阅读时间<br>2. 让孩子自己选书，尊重兴趣<br>3. 读完后和孩子讨论故事内容<br>4. 家长以身作则，自己也多看书</div></div>
+</div>
+</div>
+<div class="tab"><div class="ti on" onclick="tab('home',this)"><span class="ic">🏠</span><span>首页</span></div><div class="ti" onclick="tab('chat',this)"><span class="ic">💬</span><span>问答</span></div><div class="ti" onclick="tab('book',this)"><span class="ic">📖</span><span>绘本</span></div><div class="ti" onclick="tab('prof',this)"><span class="ic">👤</span><span>我的</span></div></div>
+</div>
+
+<!-- CHAT TAB -->
+<div id="p-chat" class="pg">
+<div style="padding:16px 20px 8px;background:#fff;border-bottom:1px solid #f0f0f0;flex-shrink:0"><h2 style="font-size:20px;color:#333">💬 育儿问答</h2><p style="font-size:12px;color:#999;margin-top:4px">AI 专业顾问为你解答育儿问题</p></div>
+<div class="cm" id="cm-t"><div class="msg ai"><div class="av">🤖</div><div class="bu">你好！我是 AI 育儿顾问 👋<br><br>有什么育儿问题都可以问我~<br>比如孩子的饮食、学习、情绪等。</div></div></div>
+<div class="ex" id="ex-t"><div class="el">🔍 常见问题</div>
+<div class="eb" onclick="aq(this,'cm-t','ex-t')">5岁孩子不爱吃饭怎么办？</div>
+<div class="eb" onclick="aq(this,'cm-t','ex-t')">幼小衔接需要提前学什么？</div>
+<div class="eb" onclick="aq(this,'cm-t','ex-t')">孩子经常发脾气怎么办？</div>
+<div class="eb" onclick="aq(this,'cm-t','ex-t')">怎么培养阅读习惯？</div></div>
+<div class="ci"><input placeholder="输入你的育儿问题..." onkeypress="if(event.key==='Enter')sm(this,'cm-t','ex-t')"><button class="sbtn" onclick="sm(this.previousElementSibling,'cm-t','ex-t')">➤</button></div>
+<div class="tab"><div class="ti" onclick="tab('home',this)"><span class="ic">🏠</span><span>首页</span></div><div class="ti on" onclick="tab('chat',this)"><span class="ic">💬</span><span>问答</span></div><div class="ti" onclick="tab('book',this)"><span class="ic">📖</span><span>绘本</span></div><div class="ti" onclick="tab('prof',this)"><span class="ic">👤</span><span>我的</span></div></div>
+</div>
+
+<!-- BOOK TAB -->
+<div id="p-book" class="pg">
+<div style="padding:16px 20px 8px;background:#fff;border-bottom:1px solid #f0f0f0;flex-shrink:0"><h2 style="font-size:20px;color:#333">📖 AI 绘本</h2><p style="font-size:12px;color:#999;margin-top:4px">为你的孩子创作专属故事</p></div>
+<div class="scrl bkpg" style="padding:20px">
+<div style="text-align:center;padding:40px 0 20px"><div style="font-size:56px">🌟</div><h3 style="font-size:18px;color:#333;margin-top:12px">开始创作专属绘本</h3><p style="font-size:13px;color:#999;margin-top:8px">只需 3 步，AI 为你的孩子写出独一无二的故事</p></div>
+<button class="bp" style="margin-top:20px" onclick="openS('s-bk1')">✨ 开始创作</button>
+<div style="text-align:center;margin-top:40px"><p style="font-size:13px;color:#999;margin-bottom:16px">—— 最近生成的绘本 ——</p>
+<div style="background:#fff;border-radius:16px;padding:16px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px"><div style="font-size:32px">🦕</div><div><div style="font-size:15px;color:#333;font-weight:600">元一的勇敢冒险</div><div style="font-size:12px;color:#999;margin-top:4px">冒险探索 · 今天 10:30</div></div></div></div>
+<div style="background:#fff;border-radius:16px;padding:16px;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.04)"><div style="display:flex;align-items:center;gap:12px"><div style="font-size:32px">🌙</div><div><div style="font-size:15px;color:#333;font-weight:600">元一的美梦之旅</div><div style="font-size:12px;color:#999;margin-top:4px">睡前故事 · 昨天 21:00</div></div></div></div></div>
+</div>
+<div class="tab"><div class="ti" onclick="tab('home',this)"><span class="ic">🏠</span><span>首页</span></div><div class="ti" onclick="tab('chat',this)"><span class="ic">💬</span><span>问答</span></div><div class="ti on" onclick="tab('book',this)"><span class="ic">📖</span><span>绘本</span></div><div class="ti" onclick="tab('prof',this)"><span class="ic">👤</span><span>我的</span></div></div>
+</div>
+
+<!-- PROFILE TAB -->
+<div id="p-prof" class="pg">
+<div class="scrl pf">
+<div class="ph"><div class="pi2"><div class="pa">😊</div><div class="pn"><h3>musk</h3><p>ID: musk_2026</p></div></div><div class="ps"><div class="si2"><div class="n">12</div><div class="l">生成绘本</div></div><div class="si2"><div class="n">58</div><div class="l">提问次数</div></div><div class="si2"><div class="n">7</div><div class="l">连续天数</div></div></div></div>
+<div class="pst"><div class="pstt">宝贝信息</div><div class="ml">
+<div class="mi" onclick="openS('s-child-edit')"><span class="mi2">👦</span><span class="mt">元一 · 6岁</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-child-edit')"><span class="mi2">👶</span><span class="mt">元宝 · 4个月</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-child-add')" style="color:#FF9F43"><span class="mi2">➕</span><span class="mt" style="color:#FF9F43">添加宝贝</span><span class="ma" style="color:#FF9F43">›</span></div>
+</div></div>
+<div class="pst"><div class="pstt">我的服务</div><div class="ml">
+<div class="mi" onclick="openS('s-my-books')"><span class="mi2">📖</span><span class="mt">我的绘本</span><span class="mb">12</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-history')"><span class="mi2">💬</span><span class="mt">问答历史</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-fav')"><span class="mi2">❤️</span><span class="mt">我的收藏</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-profile')"><span class="mi2">📊</span><span class="mt">成长档案</span><span class="ma">›</span></div>
+</div></div>
+<div class="pst"><div class="pstt">设置</div><div class="ml">
+<div class="mi" onclick="openS('s-notify')"><span class="mi2">🔔</span><span class="mt">消息通知</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-privacy')"><span class="mi2">🔒</span><span class="mt">隐私设置</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-general')"><span class="mi2">⚙️</span><span class="mt">通用设置</span><span class="ma">›</span></div>
+<div class="mi" onclick="openS('s-help')"><span class="mi2">❓</span><span class="mt">帮助与反馈</span><span class="ma">›</span></div>
+</div></div>
+<button class="lobtn" onclick="openS('s-login')">退出登录</button>
+</div>
+<div class="tab"><div class="ti" onclick="tab('home',this)"><span class="ic">🏠</span><span>首页</span></div><div class="ti" onclick="tab('chat',this)"><span class="ic">💬</span><span>问答</span></div><div class="ti" onclick="tab('book',this)"><span class="ic">📖</span><span>绘本</span></div><div class="ti on" onclick="tab('prof',this)"><span class="ic">👤</span><span>我的</span></div></div>
+</div>
+
+<!-- SUB: LOGIN -->
+<div id="s-login" class="sp">
+<div class="lpage" style="flex:1;overflow-y:auto">
+<div class="lc">
+<div class="llogo"><div class="e">🤱</div><h1>AI 育儿助手</h1><p>让 AI 陪你一起育儿</p></div>
+<div class="ltabs"><div class="ltab on" onclick="ltab('l',this)">登录</div><div class="ltab" onclick="ltab('r',this)">注册</div></div>
+<div class="lf" id="f-l">
+<div class="fg"><label>手机号</label><input class="fi" type="tel" placeholder="请输入手机号" maxlength="11"></div>
+<div class="fg"><label>验证码</label><div class="fr"><input class="fi" type="text" placeholder="请输入验证码" maxlength="6"><button class="cb" onclick="cd(this)">获取验证码</button></div></div>
+<button class="bp" onclick="toast('登录成功');setTimeout(()=>closeS('s-login'),800)">登 录</button>
+</div>
+<div class="lf" id="f-r" style="display:none">
+<div class="fg"><label>手机号</label><input class="fi" type="tel" placeholder="请输入手机号" maxlength="11"></div>
+<div class="fg"><label>验证码</label><div class="fr"><input class="fi" type="text" placeholder="请输入验证码" maxlength="6"><button class="cb" onclick="cd(this)">获取验证码</button></div></div>
+<div class="fg"><label>设置密码</label><input class="fi" type="password" placeholder="请设置 6-20 位密码"></div>
+<div class="fg"><label>确认密码</label><input class="fi" type="password" placeholder="请再次输入密码"></div>
+<div class="fg"><label>昵称</label><input class="fi" type="text" placeholder="给自己取个名字吧"></div>
+<button class="bp" onclick="toast('注册成功');setTimeout(()=>closeS('s-login'),800)">注 册</button>
+</div>
+<div class="lftr"><div class="dv">其他登录方式</div><div class="sl"><div class="sb" onclick="toast('微信登录')">💚</div><div class="sb" onclick="toast('Apple 登录')">🍎</div></div>
+<div class="lag">登录即代表同意 <a href="javascript:void(0)">《用户协议》</a> 和 <a href="javascript:void(0)">《隐私政策》</a></div></div>
+</div>
+</div>
+</div>
+
+<!-- SUB: CHAT -->
+<div id="s-chat" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-chat')">←</span><span class="tt">育儿问答</span></div>
+<div class="cm" id="cm-s"><div class="msg ai"><div class="av">🤖</div><div class="bu">你好！我是 AI 育儿顾问 👋<br><br>你可以问我任何育儿相关的问题，比如：<br>• 孩子的行为习惯<br>• 饮食营养<br>• 学习启蒙<br>• 情绪管理<br><br>点击下方问题快速开始~</div></div></div>
+<div class="ex" id="ex-s"><div class="el">🔍 常见问题</div>
+<div class="eb" onclick="aq(this,'cm-s','ex-s')">5岁孩子不爱吃饭怎么办？</div>
+<div class="eb" onclick="aq(this,'cm-s','ex-s')">幼小衔接需要提前学什么？</div>
+<div class="eb" onclick="aq(this,'cm-s','ex-s')">孩子经常发脾气怎么办？</div></div>
+<div class="ci"><input placeholder="输入你的育儿问题..." onkeypress="if(event.key==='Enter')sm(this,'cm-s','ex-s')"><button class="sbtn" onclick="sm(this.previousElementSibling,'cm-s','ex-s')">➤</button></div>
+</div>
+
+<!-- SUB: BOOK STEP 1 -->
+<div id="s-bk1" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-bk1')">←</span><span class="tt">生成专属绘本</span></div>
+<div class="scrl bkpg">
+<div class="bkst">
+<div class="sdi"><div class="sd on"></div><div class="sd"></div><div class="sd"></div></div>
+<div style="text-align:center;margin-bottom:24px"><div style="font-size:32px">📖</div><h2 style="font-size:20px;color:#333;margin-top:8px">为你的孩子生成专属故事</h2></div>
+<div class="fg"><label>孩子的名字 <span style="color:#FF6B6B">*</span></label><input class="fi" type="text" placeholder="输入孩子的名字" value="元一"></div>
+<div class="fg"><label>孩子的年龄 <span style="color:#FF6B6B">*</span></label><div class="gs"><button class="gb" onclick="sl(this)">3岁</button><button class="gb" onclick="sl(this)">4岁</button><button class="gb" onclick="sl(this)">5岁</button><button class="gb on" onclick="sl(this)">6岁</button></div></div>
+<div class="fg"><label>性别（选填）</label><div class="gs"><button class="gb on" onclick="sl(this)">👦 男孩</button><button class="gb" onclick="sl(this)">👧 女孩</button></div></div>
+<div class="fg"><label>兴趣爱好（选填）</label><input class="fi" type="text" placeholder="如：恐龙、画画、足球" value="恐龙、画画"><div style="font-size:12px;color:#999;margin-top:6px">可以写多个，用逗号分隔</div></div>
+<button class="bp" onclick="openS('s-bk2')">下一步 →</button>
+</div>
+</div>
+</div>
+
+<!-- SUB: BOOK STEP 2 -->
+<div id="s-bk2" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-bk2')">←</span><span class="tt">选择故事主题</span></div>
+<div class="scrl bkpg">
+<div class="bkst">
+<div class="sdi"><div class="sd"></div><div class="sd on"></div><div class="sd"></div></div>
+<h2 style="font-size:20px;color:#333;text-align:center;margin-bottom:4px">选一个故事主题 🌟</h2>
+<p style="text-align:center;color:#999;font-size:13px;margin-bottom:12px">为元一选择一个故事方向</p>
+<div class="tg">
+<div class="tc2" onclick="sl(this)"><div class="ti2">🌙</div><div class="tn">睡前故事</div><div class="td">温馨安宁，伴你入眠</div></div>
+<div class="tc2" onclick="sl(this)"><div class="ti2">🏔️</div><div class="tn">冒险探索</div><div class="td">勇敢好奇，发现世界</div></div>
+<div class="tc2" onclick="sl(this)"><div class="ti2">🤝</div><div class="tn">友谊成长</div><div class="td">分享合作，快乐相伴</div></div>
+<div class="tc2" onclick="sl(this)"><div class="ti2">📚</div><div class="tn">学习发现</div><div class="td">好奇心驱动的奇妙旅程</div></div>
+<div class="tc2" onclick="sl(this)"><div class="ti2">💪</div><div class="tn">勇气故事</div><div class="td">克服恐惧，变得勇敢</div></div>
+</div>
+<button class="bp" onclick="openS('s-bk3')">生成故事 ✨</button>
+</div>
+</div>
+</div>
+
+<!-- SUB: BOOK LOADING -->
+<div id="s-bk3" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-bk3')">←</span><span class="tt">生成专属绘本</span></div>
+<div class="scrl bkpg"><div class="ldc"><div class="le">✨</div><div class="lt">正在为 元一 创作故事...</div><div style="margin-top:8px;font-size:13px;color:#999">AI 正在努力写作中，请稍候~</div>
+<button class="bp" style="margin-top:40px;width:auto;padding:0 40px" onclick="closeS('s-bk3');openS('s-bk4')">→ 查看故事</button></div></div>
+</div>
+
+<!-- SUB: BOOK STORY -->
+<div id="s-bk4" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-bk4')">←</span><span class="tt">元一的勇气故事</span></div>
+<div class="scrl bkpg">
+<div class="stc">
+<div class="sdi" style="margin-bottom:16px"><div class="sd"></div><div class="sd"></div><div class="sd on"></div></div>
+<div class="stimg">🦕🌟🎨</div>
+<div class="stt2">元一的勇敢冒险</div>
+<div class="sttx">
+<p>从前，有一个叫元一的小男孩，他今年六岁了。元一最喜欢的事情就是画恐龙和探险，他的房间里贴满了恐龙的画。</p>
+<p>有一天，元一发现家门口出现了一道彩虹色的光。他好奇地走过去，发现那是一道通往恐龙世界的神奇门！</p>
+<p>"我要不要进去呢？"元一心里有点害怕。但他想起了老师说过："勇敢不是不害怕，而是害怕了还愿意去尝试。"</p>
+<p>于是，元一深吸一口气，勇敢地走进了那道光里。</p>
+<p>恐龙世界里有一只小三角龙叫豆豆，它被困在河边，过不去了。元一想了想，用他画画的本领，在纸上画了一座桥。神奇的事情发生了——那座桥竟然真的出现在了河面上！</p>
+<p>豆豆高兴地跑过来，用小角轻轻碰了碰元一的手："谢谢你，元一！你是最勇敢的小朋友！"</p>
+<p>元一笑了，他发现，原来勇气就在自己心里。从此以后，每当遇到害怕的事情，他都会想起恐龙世界里的豆豆，然后勇敢地迈出那一步。</p>
+<p style="text-align:center;font-size:14px;color:#999;text-indent:0">—— 全文完 ——</p>
+</div>
+</div>
+<div class="stac"><button class="pb">🔊 朗读故事</button><button onclick="toast('已重新生成')">🔄 换一个</button><button onclick="closeS('s-bk4')">🏠 回首页</button></div>
+</div>
+</div>
+
+<!-- ==================== NEW SUB PAGES (v3) ==================== -->
+
+<!-- GROWTH RECORDS -->
+<div id="s-growth" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-growth')">←</span><span class="tt">成长记录</span><span class="rt" onclick="toast('已添加记录')">＋</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div style="padding:20px"><div style="display:flex;gap:10px;margin-bottom:20px">
+<div style="flex:1;background:#fff;border-radius:12px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:700;color:#FF9F43">122</div><div style="font-size:11px;color:#999;margin-top:4px">身高(cm)</div></div>
+<div style="flex:1;background:#fff;border-radius:12px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:700;color:#54A0FF">22</div><div style="font-size:11px;color:#999;margin-top:4px">体重(kg)</div></div>
+<div style="flex:1;background:#fff;border-radius:12px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:700;color:#FF6B6B">6</div><div style="font-size:11px;color:#999;margin-top:4px">年龄(岁)</div></div>
+</div>
+<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+<span style="font-size:18px">👦</span><div><div style="font-size:15px;color:#333;font-weight:600">元一的成长记录</div><div style="font-size:12px;color:#999">共 28 条记录</div></div>
+</div></div>
+<div class="timeline">
+<div class="timeline-item"><div class="timeline-dot" style="background:#FFF5E6">🎉</div><div class="timeline-content"><h4>学会了骑自行车！</h4><p>元一今天终于不需要辅助轮就能骑自行车了，非常棒！</p><div class="tl-time">2026-03-15</div></div></div>
+<div class="timeline-item"><div class="timeline-dot" style="background:#E8F4FF">📝</div><div class="timeline-content"><h4>幼儿园期中评估</h4><p>老师反馈元一在数学和语言方面表现突出，社交能力也在进步。</p><div class="tl-time">2026-03-10</div></div></div>
+<div class="timeline-item"><div class="timeline-dot" style="background:#FFECD2">📏</div><div class="timeline-content"><h4>身高体重测量</h4><p>身高 122cm，体重 22kg，均在同龄正常范围内。</p><div class="tl-time">2026-03-01</div></div></div>
+<div class="timeline-item"><div class="timeline-dot" style="background:#F0FFF0">🎨</div><div class="timeline-content"><h4>画了一幅超棒的恐龙画</h4><p>用蜡笔画了一幅霸王龙，还画了火山和森林，细节很丰富。</p><div class="tl-time">2026-02-25</div></div></div>
+<div class="timeline-item"><div class="timeline-dot" style="background:#FFF0F0">🗣️</div><div class="timeline-content"><h4>第一次完整讲了一个故事</h4><p>自己编了一个关于小兔子找妈妈的故事，逻辑完整，很惊喜。</p><div class="tl-time">2026-02-20</div></div></div>
+</div></div></div>
+
+<!-- INTERACTIVE GAMES -->
+<div id="s-games" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-games')">←</span><span class="tt">互动游戏</span></div>
+<div class="scrl" style="background:#F8F9FA;padding:16px 20px">
+<div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto">
+<div style="flex-shrink:0;padding:8px 16px;background:#FF9F43;color:#fff;border-radius:20px;font-size:13px;cursor:pointer">全部</div>
+<div style="flex-shrink:0;padding:8px 16px;background:#fff;color:#666;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #e8e8e8" onclick="toast('筛选：语言')">🔤 语言</div>
+<div style="flex-shrink:0;padding:8px 16px;background:#fff;color:#666;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #e8e8e8" onclick="toast('筛选：数学')">🔢 数学</div>
+<div style="flex-shrink:0;padding:8px 16px;background:#fff;color:#666;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #e8e8e8" onclick="toast('筛选：认知')">🧠 认知</div>
+</div>
+<div class="game-list">
+<div class="game-card" onclick="toast('进入：汉字冒险岛')"><div class="gc-banner" style="background:linear-gradient(135deg,#FFECD2,#FCB69F)">🏴‍☠️</div><div class="gc-info"><h4>汉字冒险岛</h4><p>在冒险中学习常用汉字，适合5-6岁</p><div class="gc-tags"><span class="gc-tag">语言</span><span class="gc-tag">5-6岁</span><span class="gc-tag">⭐ 4.8</span></div></div></div>
+<div class="game-card" onclick="toast('进入：数字消消乐')"><div class="gc-banner" style="background:linear-gradient(135deg,#D4E5FF,#A8D8FF)">🔢</div><div class="gc-info"><h4>数字消消乐</h4><p>趣味数学运算，培养数感和逻辑思维</p><div class="gc-tags"><span class="gc-tag">数学</span><span class="gc-tag">4-6岁</span><span class="gc-tag">⭐ 4.6</span></div></div></div>
+<div class="game-card" onclick="toast('进入：动物认知大挑战')"><div class="gc-banner" style="background:linear-gradient(135deg,#E8F8E8,#B8E8B8)">🦁</div><div class="gc-info"><h4>动物认知大挑战</h4><p>认识各种动物，学习它们的特征和习性</p><div class="gc-tags"><span class="gc-tag">认知</span><span class="gc-tag">3-5岁</span><span class="gc-tag">⭐ 4.9</span></div></div></div>
+<div class="game-card" onclick="toast('进入：英语启蒙乐园')"><div class="gc-banner" style="background:linear-gradient(135deg,#FFF0F0,#FFD4D4)">🌍</div><div class="gc-info"><h4>英语启蒙乐园</h4><p>通过儿歌和互动学习基础英语单词</p><div class="gc-tags"><span class="gc-tag">语言</span><span class="gc-tag">3-6岁</span><span class="gc-tag">⭐ 4.7</span></div></div></div>
+<div class="game-card" onclick="toast('进入：形状拼图')"><div class="gc-banner" style="background:linear-gradient(135deg,#F5E6FF,#D8BFFF)">🧩</div><div class="gc-info"><h4>形状拼图</h4><p>认识基本形状，锻炼空间想象力</p><div class="gc-tags"><span class="gc-tag">认知</span><span class="gc-tag">3-4岁</span><span class="gc-tag">⭐ 4.5</span></div></div></div>
+</div></div></div>
+
+<!-- MY BOOKS -->
+<div id="s-my-books" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-my-books')">←</span><span class="tt">我的绘本</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div style="padding:16px 20px 0;display:flex;gap:8px"><div style="flex:1;padding:8px 14px;background:#FF9F43;color:#fff;border-radius:16px;text-align:center;font-size:13px;cursor:pointer">全部 (12)</div><div style="flex:1;padding:8px 14px;background:#fff;color:#666;border-radius:16px;text-align:center;font-size:13px;cursor:pointer;border:1px solid #e8e8e8">冒险 (4)</div><div style="flex:1;padding:8px 14px;background:#fff;color:#666;border-radius:16px;text-align:center;font-size:13px;cursor:pointer;border:1px solid #e8e8e8">睡前 (5)</div></div>
+<div class="book-list">
+<div class="book-item" onclick="openS('s-bk4')"><div class="book-cover" style="background:linear-gradient(135deg,#FFECD2,#FCB69F)">🦕</div><div class="book-info"><h4>元一的勇敢冒险</h4><p>关于恐龙世界的冒险故事，元一用画画的魔力帮助了小三角龙豆豆。</p><div class="bi-tags"><span class="bi-tag">冒险探索</span><span class="bi-tag">578字</span></div></div></div>
+<div class="book-item"><div class="book-cover" style="background:linear-gradient(135deg,#E8E8FF,#C8C8FF)">🌙</div><div class="book-info"><h4>元一的美梦之旅</h4><p>元一在梦里飞上了天空，和星星一起唱歌跳舞的温馨故事。</p><div class="bi-tags"><span class="bi-tag">睡前故事</span><span class="bi-tag">432字</span></div></div></div>
+<div class="book-item"><div class="book-cover" style="background:linear-gradient(135deg,#E8F8E8,#B8E8B8)">🤝</div><div class="book-info"><h4>元一和新朋友</h4><p>转学到新学校后，元一如何交到新朋友的温暖故事。</p><div class="bi-tags"><span class="bi-tag">友谊成长</span><span class="bi-tag">501字</span></div></div></div>
+<div class="book-item"><div class="book-cover" style="background:linear-gradient(135deg,#FFF0F0,#FFD4D4)">💪</div><div class="book-info"><h4>元一不怕黑了</h4><p>关于克服怕黑的故事，元一发现黑暗中也有美好的事物。</p><div class="bi-tags"><span class="bi-tag">勇气故事</span><span class="bi-tag">389字</span></div></div></div>
+</div></div></div>
+
+<!-- Q&A HISTORY -->
+<div id="s-history" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-history')">←</span><span class="tt">问答历史</span><span class="rt" onclick="toast('搜索')">🔍</span></div>
+<div class="scrl" style="background:#F8F9FA"><div class="hist-list">
+<div class="hist-item" onclick="toast('查看对话')"><h4>5岁孩子不爱吃饭怎么办？ <span>3/15</span></h4><p>我理解你的担心。可以试试：1. 不强迫，让孩子自己决定吃什么...</p></div>
+<div class="hist-item" onclick="toast('查看对话')"><h4>幼小衔接需要提前学什么？ <span>3/14</span></h4><p>幼小衔接阶段建议重点培养：1. 生活自理能力 2. 社交能力...</p></div>
+<div class="hist-item" onclick="toast('查看对话')"><h4>孩子经常发脾气怎么办？ <span>3/12</span></h4><p>孩子发脾气是情绪表达能力还在发展中。建议先接纳情绪...</p></div>
+<div class="hist-item" onclick="toast('查看对话')"><h4>怎么培养阅读习惯？ <span>3/10</span></h4><p>培养阅读习惯的关键：1. 固定时间，每天15-20分钟亲子共读...</p></div>
+</div></div></div>
+
+<!-- FAVORITES -->
+<div id="s-fav" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-fav')">←</span><span class="tt">我的收藏</span></div>
+<div class="scrl" style="background:#F8F9FA"><div class="hist-list">
+<div class="hist-item" onclick="toast('查看收藏')"><h4>📖 元一的勇敢冒险 <span>绘本</span></h4><p>冒险探索 · 578字 · 3/15 收藏</p></div>
+<div class="hist-item" onclick="toast('查看收藏')"><h4>💡 如何培养孩子的自信心 <span>问答</span></h4><p>自信心来源于被认可和成功体验。建议多给孩子创造"小成功"的机会...</p></div>
+<div class="hist-item" onclick="toast('查看收藏')"><h4>💡 3-6岁儿童运动指南 <span>问答</span></h4><p>每天至少1小时户外活动。推荐：跑跳、攀爬、骑自行车、拍球...</p></div>
+</div></div></div>
+
+<!-- GROWTH PROFILE -->
+<div id="s-profile" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-profile')">←</span><span class="tt">成长档案</span><span class="rt" onclick="openS('s-child-edit')">编辑</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div class="child-card"><div class="cc-top"><div class="cc-avatar" style="background:#FFF5E6">👦</div><div><div class="cc-name">万乾元（元一）</div><div class="cc-age">6岁 · 男 · 2020年3月出生</div></div></div>
+<div class="cc-stats"><div class="cc-stat"><div class="cs-num">122</div><div class="cs-label">身高cm</div></div><div class="cc-stat"><div class="cs-num">22</div><div class="cs-label">体重kg</div></div><div class="cc-stat"><div class="cs-num">A+</div><div class="cs-label">综合评级</div></div></div>
+<div class="cc-tags"><span class="cc-tag">🦕 恐龙</span><span class="cc-tag">🎨 画画</span><span class="cc-tag">🚴 骑车</span><span class="cc-tag">📚 故事</span></div></div>
+<div style="padding:0 20px"><div style="font-size:15px;font-weight:600;color:#333;margin-bottom:14px">📈 发育评估</div>
+<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:#666">语言能力</span><span style="font-size:13px;color:#FF9F43;font-weight:600">优秀 ★★★★★</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="width:92%;height:100%;background:#FF9F43;border-radius:4px"></div></div></div>
+<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:#666">数学思维</span><span style="font-size:13px;color:#54A0FF;font-weight:600">良好 ★★★★☆</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="width:78%;height:100%;background:#54A0FF;border-radius:4px"></div></div></div>
+<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:#666">社交能力</span><span style="font-size:13px;color:#4ECB71;font-weight:600">良好 ★★★★☆</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="width:75%;height:100%;background:#4ECB71;border-radius:4px"></div></div></div>
+<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:#666">运动能力</span><span style="font-size:13px;color:#FF6B6B;font-weight:600">优秀 ★★★★★</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="width:88%;height:100%;background:#FF6B6B;border-radius:4px"></div></div></div>
+<div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;color:#666">创造力</span><span style="font-size:13px;color:#A855F7;font-weight:600">优秀 ★★★★★</span></div><div style="height:8px;background:#f0f0f0;border-radius:4px"><div style="width:95%;height:100%;background:#A855F7;border-radius:4px"></div></div></div>
+</div></div></div>
+
+<!-- NOTIFICATIONS -->
+<div id="s-notify" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-notify')">←</span><span class="tt">消息通知</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div style="padding:20px 20px 12px"><h3 style="font-size:15px;color:#333;font-weight:600">推送通知</h3></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>育儿知识推送</h4><p>每天推送精选育儿内容</p></div><div class="toggle on"></div></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>绘本更新提醒</h4><p>有新绘本模板时通知你</p></div><div class="toggle on"></div></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>学习打卡提醒</h4><p>每天提醒陪伴孩子学习</p></div><div class="toggle on"></div></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>活动通知</h4><p>促销活动和新功能上线</p></div><div class="toggle"></div></div>
+<div style="padding:20px 20px 12px"><h3 style="font-size:15px;color:#333;font-weight:600">免打扰</h3></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>夜间免打扰</h4><p>22:00 - 08:00 不推送</p></div><div class="toggle on"></div></div>
+<div style="padding:0 20px"><div style="background:#fff;border-radius:12px;padding:16px;margin-top:12px;cursor:pointer" onclick="toast('设置免打扰时段')"><div style="display:flex;justify-content:space-between"><span style="font-size:15px;color:#333">免打扰时段</span><span style="font-size:13px;color:#999">22:00 - 08:00 ›</span></div></div></div>
+</div></div>
+
+<!-- PRIVACY -->
+<div id="s-privacy" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-privacy')">←</span><span class="tt">隐私设置</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div style="padding:20px 20px 12px"><h3 style="font-size:15px;color:#333;font-weight:600">数据与隐私</h3></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>允许使用数据优化体验</h4><p>用于改善 AI 回答质量</p></div><div class="toggle on"></div></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>个性化推荐</h4><p>根据使用习惯推荐内容</p></div><div class="toggle on"></div></div>
+<div class="toggle-row" onclick="this.querySelector('.toggle').classList.toggle('on')"><div class="tr-left"><h4>分享使用数据</h4><p>匿名分享以帮助改进产品</p></div><div class="toggle"></div></div>
+<div style="padding:20px"><h3 style="font-size:15px;color:#333;font-weight:600;margin-bottom:12px">数据管理</h3>
+<div style="background:#fff;border-radius:12px;overflow:hidden">
+<div style="padding:16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="toast('正在导出...')"><div style="font-size:15px;color:#333">导出我的数据</div><div style="font-size:12px;color:#999;margin-top:4px">导出您的所有使用数据</div></div>
+<div style="padding:16px;border-bottom:1px solid #f5f5f5;cursor:pointer" onclick="toast('确认清除？')"><div style="font-size:15px;color:#FF6B6B">清除对话记录</div><div style="font-size:12px;color:#999;margin-top:4px">清除所有育儿问答对话历史</div></div>
+<div style="padding:16px;cursor:pointer" onclick="toast('确认注销？')"><div style="font-size:15px;color:#FF6B6B">注销账号</div><div style="font-size:12px;color:#999;margin-top:4px">永久删除账号和所有数据</div></div>
+</div></div></div></div>
+
+<!-- GENERAL SETTINGS -->
+<div id="s-general" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-general')">←</span><span class="tt">通用设置</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div class="set-section"><div class="ss-title">基础设置</div><div class="ml">
+<div class="set-item" onclick="toast('选择语言')"><span class="si-icon">🌐</span><span class="si-text">语言</span><span class="si-val">简体中文</span><span class="si-arrow">›</span></div>
+<div class="set-item" onclick="toast('选择字体大小')"><span class="si-icon">🔤</span><span class="si-text">字体大小</span><span class="si-val">标准</span><span class="si-arrow">›</span></div>
+<div class="set-item" onclick="toast('选择主题')"><span class="si-icon">🎨</span><span class="si-text">深色模式</span><span class="si-val">跟随系统</span><span class="si-arrow">›</span></div>
+</div></div>
+<div class="set-section"><div class="ss-title">AI 设置</div><div class="ml">
+<div class="set-item" onclick="toast('选择回复风格')"><span class="si-icon">🤖</span><span class="si-text">AI 回复风格</span><span class="si-val">温和专业</span><span class="si-arrow">›</span></div>
+<div class="set-item" onclick="toast('选择回答长度')"><span class="si-icon">📏</span><span class="si-text">回答详细程度</span><span class="si-val">适中</span><span class="si-arrow">›</span></div>
+<div class="set-item" onclick="toast('选择语音')"><span class="si-icon">🔊</span><span class="si-text">朗读语音</span><span class="si-val">温柔女声</span><span class="si-arrow">›</span></div>
+<div class="set-item" onclick="toast('选择语速')"><span class="si-icon">⏱️</span><span class="si-text">朗读语速</span><span class="si-val">正常</span><span class="si-arrow">›</span></div>
+</div></div>
+<div class="set-section"><div class="ss-title">存储</div><div class="ml">
+<div class="set-item" onclick="toast('清除缓存成功')"><span class="si-icon">🗑️</span><span class="si-text">清除缓存</span><span class="si-val">23.5 MB</span><span class="si-arrow">›</span></div>
+</div></div>
+<div style="padding:20px"><div style="font-size:12px;color:#bbb;text-align:center">AI 育儿助手 v1.0.0<br>© 2026</div></div>
+</div></div>
+
+<!-- HELP & FEEDBACK -->
+<div id="s-help" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-help')">←</span><span class="tt">帮助与反馈</span></div>
+<div class="scrl" style="background:#F8F9FA">
+<div style="padding:20px"><div style="text-align:center;margin-bottom:24px"><div style="font-size:40px">💬</div><h3 style="font-size:17px;color:#333;margin-top:10px">常见问题</h3></div>
+<div class="faq-list">
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q"><span>如何生成个性化绘本？</span><span>›</span></div><div class="faq-a">进入「AI 绘本」页面，点击「开始创作」，填写孩子的姓名、年龄和兴趣爱好，选择一个故事主题即可。</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q"><span>AI 回答不准确怎么办？</span><span>›</span></div><div class="faq-a">可以提供更多孩子信息，或在「设置」中调整 AI 回复风格和详细程度。</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q"><span>如何添加多个宝贝？</span><span>›</span></div><div class="faq-a">在「我的」→「宝贝信息」中点击「添加宝贝」即可。</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q"><span>如何删除对话记录？</span><span>›</span></div><div class="faq-a">前往「我的」→「设置」→「隐私设置」→「清除对话记录」。</div></div>
+</div></div>
+<div style="padding:0 20px 20px"><div style="background:#fff;border-radius:16px;padding:20px">
+<h4 style="font-size:15px;color:#333;margin-bottom:16px">📝 意见反馈</h4>
+<div class="fb-form" style="padding:0">
+<div class="fg2"><label>反馈类型</label><div style="display:flex;gap:8px"><div style="flex:1;padding:8px;background:#FFF5E6;color:#FF9F43;border-radius:8px;text-align:center;font-size:13px;cursor:pointer;border:2px solid #FF9F43">功能建议</div><div style="flex:1;padding:8px;background:#fff;color:#666;border-radius:8px;text-align:center;font-size:13px;cursor:pointer;border:2px solid #e8e8e8" onclick="toast('选择：Bug')">Bug 反馈</div><div style="flex:1;padding:8px;background:#fff;color:#666;border-radius:8px;text-align:center;font-size:13px;cursor:pointer;border:2px solid #e8e8e8" onclick="toast('选择：其他')">其他</div></div></div>
+<div class="fg2"><label>详细描述</label><textarea style="width:100%;height:100px;border-radius:12px;border:2px solid #E8E8E8;padding:14px;font-size:14px;outline:none;resize:none;font-family:inherit" placeholder="请描述您的问题或建议..."></textarea></div>
+<button class="bp" onclick="toast('感谢反馈！')">提交反馈</button>
+</div></div></div>
+</div></div>
+
+<!-- CHILD EDIT -->
+<div id="s-child-edit" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-child-edit')">←</span><span class="tt">编辑宝贝信息</span><span class="rt" style="color:#FF9F43" onclick="toast('已保存')">保存</span></div>
+<div class="scrl" style="background:#F8F9FA"><div class="edit-form">
+<div style="text-align:center;margin-bottom:24px"><div style="width:80px;height:80px;border-radius:40px;background:#FFF5E6;display:inline-flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer">👦</div><div style="font-size:12px;color:#999;margin-top:8px;cursor:pointer" onclick="toast('选择头像')">点击更换头像</div></div>
+<div class="ef-row"><label>昵称</label><input type="text" value="元一"></div>
+<div class="ef-row"><label>真实姓名</label><input type="text" value="万乾元"></div>
+<div class="ef-row"><label>性别</label><div class="gs"><button class="gb on" onclick="sl(this)">👦 男孩</button><button class="gb" onclick="sl(this)">👧 女孩</button></div></div>
+<div class="ef-row"><label>出生日期</label><input type="date" value="2020-03-15"></div>
+<div class="ef-row"><label>兴趣爱好</label><input type="text" value="恐龙、画画、骑车、故事"></div>
+<div class="ef-row"><label>性格特点</label><input type="text" value="活泼好动、好奇心强"></div>
+<div class="ef-row"><label>备注</label><textarea style="width:100%;height:80px;border-radius:12px;border:2px solid #E8E8E8;padding:12px;font-size:14px;outline:none;resize:none;font-family:inherit" placeholder="其他想记录的信息...">喜欢恐龙，最近迷上了画画。准备上小学，正在做幼小衔接。</textarea></div>
+<button class="bp" onclick="toast('保存成功');setTimeout(()=>closeS('s-child-edit'),500)">保存修改</button>
+<button style="width:100%;height:48px;border-radius:24px;border:none;background:#fff;color:#FF6B6B;font-size:15px;cursor:pointer;margin-top:12px;border:2px solid #FF6B6B" onclick="toast('确认删除？')">删除宝贝</button>
+</div></div></div>
+
+<!-- CHILD ADD -->
+<div id="s-child-add" class="sp">
+<div class="nb"><span class="bk" onclick="closeS('s-child-add')">←</span><span class="tt">添加宝贝</span></div>
+<div class="scrl" style="background:#F8F9FA"><div class="edit-form">
+<div style="text-align:center;margin-bottom:24px"><div style="width:80px;height:80px;border-radius:40px;background:#f0f0f0;display:inline-flex;align-items:center;justify-content:center;font-size:32px;border:2px dashed #ccc;cursor:pointer" onclick="toast('上传照片')">+</div><div style="font-size:12px;color:#999;margin-top:8px">点击上传照片（选填）</div></div>
+<div class="ef-row"><label>昵称 *</label><input type="text" placeholder="宝贝的小名"></div>
+<div class="ef-row"><label>性别 *</label><div class="gs"><button class="gb" onclick="sl(this)">👦 男孩</button><button class="gb" onclick="sl(this)">👧 女孩</button></div></div>
+<div class="ef-row"><label>出生日期 *</label><input type="date"></div>
+<div class="ef-row"><label>兴趣爱好（选填）</label><input type="text" placeholder="如：恐龙、画画、积木"></div>
+<button class="bp" onclick="toast('添加成功');setTimeout(()=>closeS('s-child-add'),500)">添加宝贝</button>
+</div></div></div>
+
+<!-- Toast -->
+<div id="toast" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:999;pointer-events:none"></div>
+
+<script>
+function tab(n,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+n).classList.add('on');
+}
+function openS(id){document.getElementById(id).classList.add('on')}
+function closeS(id){document.getElementById(id).classList.remove('on')}
+function sl(el){el.parentElement.querySelectorAll('.gb,.tc2').forEach(b=>b.classList.remove('on'));el.classList.add('on')}
+function ltab(t,el){
+  el.parentElement.querySelectorAll('.ltab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('f-l').style.display=t==='l'?'block':'none';
+  document.getElementById('f-r').style.display=t==='r'?'block':'none';
+}
+function cd(el){
+  el.disabled=true;let s=59;
+  let t=setInterval(()=>{s--;el.textContent=s+'s';if(s<=0){clearInterval(t);el.textContent='获取验证码';el.disabled=false}},1000);
+}
+function toast(m){
+  let t=document.getElementById('toast');t.textContent=m;t.style.display='block';
+  setTimeout(()=>t.style.display='none',1500);
+}
+
+// ======== 真实 AI API ========
+const chatHistory = [];
+let sending = false;
+
+async function callAI(userText) {
+  chatHistory.push({ role: 'user', content: userText });
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: chatHistory })
+  });
+  const data = await res.json();
+  if (data.success) {
+    chatHistory.push({ role: 'assistant', content: data.text });
+    return data.text;
+  }
+  return '抱歉，服务暂时不可用，请稍后再试 😣';
+}
+
+function aq(el,cm,ex){
+  if(sending)return;
+  document.getElementById(ex).style.display='none';
+  addUser(document.getElementById(cm),el.textContent);
+  sendAI(document.getElementById(cm));
+}
+function sm(inp,cm,ex){
+  let t=inp.value.trim();if(!t||sending)return;inp.value='';
+  document.getElementById(ex).style.display='none';
+  addUser(document.getElementById(cm),t);
+  sendAI(document.getElementById(cm));
+}
+function addUser(c,t){
+  let d=document.createElement('div');d.className='msg us';
+  d.innerHTML='<div class="av">😊</div><div class="bu">'+t.replace(/</g,'&lt;')+'</div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+async function sendAI(c){
+  if(sending)return;
+  sending=true;
+  let d=document.createElement('div');d.className='msg ai';d.id='tp';
+  d.innerHTML='<div class="av">🤖</div><div class="bu"><div class="tdi"><div class="tdd"></div><div class="tdd"></div><div class="tdd"></div></div></div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+
+  const lastUserMsg = chatHistory.length>0?chatHistory[chatHistory.length-1].content:'';
+  const text = await callAI(lastUserMsg);
+  d.remove();
+
+  let r=document.createElement('div');r.className='msg ai';
+  r.innerHTML='<div class="av">🤖</div><div class="bu">'+text.replace(/\n/g,'<br>')+'</div>';
+  c.appendChild(r);c.scrollTop=c.scrollHeight;
+  sending=false;
+}
+
+// 实时时钟
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=
+    now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+}
+updateClock();setInterval(updateClock,30000);
+</script>
+</body></html>
